@@ -10,21 +10,20 @@ pub struct PuzzleState {
 }
 
 impl PuzzleState {
-    pub fn generate(base_pieces: &Vec<Piece>, generators: &Vec<Permutation>) -> Self {
+    pub fn generate(mut base_pieces: Vec<Piece>, generators: &Vec<Permutation>) -> Self {
         let mut gen_pieces = Vec::new();
-        let mut pieces_temp = base_pieces.clone();
-        while !pieces_temp.is_empty() {
+        while !base_pieces.is_empty() {
             'generator_loop: for g in generators {
-                let mut new = pieces_temp[0].clone().rotate(g);
+                let mut new = base_pieces[0].clone().rotate(g);
                 for piece in &gen_pieces {
                     if new.overlaps(piece) {
                         continue 'generator_loop;
                     }
                 }
                 new.att = Permutation::identity(new.degree());
-                pieces_temp.push(new);
+                base_pieces.push(new);
             }
-            gen_pieces.push(pieces_temp.swap_remove(0));
+            gen_pieces.push(base_pieces.swap_remove(0));
         }
         Self {
             degree: generators[0].deg,
@@ -72,11 +71,7 @@ impl PuzzleState {
                 grip: g,
                 rot: recenter
                     .product(&face_recenter)
-                    .product(&Permutation::new(if rng.random_bool(0.5) {
-                        vec![0, 1, 5, 10, 8, 6, 2, 4, 7, 3, 9]
-                    } else {
-                        vec![0, 1, 6, 9, 7, 2, 5, 8, 4, 10, 3]
-                    }))
+                    .product(&setup11c::face_rot(rng.random_bool(0.5)))
                     .product(&face_recenter.inverse())
                     .product(&recenter.inverse()),
             })

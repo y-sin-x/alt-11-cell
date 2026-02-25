@@ -33,6 +33,16 @@ impl Permutation {
         Self::new(prod)
     }
 
+    pub fn exp(&self, n: usize) -> Self {
+        let mut e = Permutation::identity(self.deg);
+        for i in 0..self.deg {
+            for _ in 0..n {
+                e.perm[i] = self.perm[e.perm[i]];
+            }
+        }
+        e
+    }
+
     pub fn permute(&self, num: usize) -> usize {
         self.perm[num]
     }

@@ -1,6 +1,6 @@
 use eframe::egui::{self, Event, PointerButton, Pos2};
 
-use crate::puzzle::{setup11c, state::PuzzleState, view::PuzzleView};
+use crate::puzzle::{setup11c, state::PuzzleState, view::PuzzleView, viewsettings::ViewSettings};
 
 pub struct App {
     puzzle: PuzzleView,
@@ -10,16 +10,13 @@ impl App {
     pub fn new(_cc: &eframe::CreationContext<'_>) -> Self {
         App {
             puzzle: PuzzleView {
-                state: PuzzleState::generate(&setup11c::base_pieces(), &setup11c::generators()),
+                state: PuzzleState::generate(setup11c::base_pieces(), &setup11c::generators()),
                 was_scrambled: false,
-                cell_pos: setup11c::cell_positions(),
-                cell_scale: setup11c::cell_scales(),
-                faces: setup11c::faces(),
                 alt_view: false,
-                edge_size: 0.1,
-                gap_size: 0.1,
-                scale: 100.0,
-                offset: Pos2::new(600.0, 500.0),
+                filters: setup11c::filters(),
+                filter_idx: 0,
+                faces: setup11c::faces(),
+                settings: ViewSettings::default(),
             },
         }
     }
@@ -66,6 +63,16 @@ impl eframe::App for App {
                     ui.input(|i| i.pointer.latest_pos().unwrap_or(Pos2::default())),
                     false,
                 );
+            }
+
+            if ui.input(|i| i.key_pressed(egui::Key::ArrowRight))
+                && self.puzzle.filter_idx < self.puzzle.filters.len() - 1
+            {
+                self.puzzle.filter_idx += 1;
+            }
+
+            if ui.input(|i| i.key_pressed(egui::Key::ArrowLeft)) && self.puzzle.filter_idx > 0 {
+                self.puzzle.filter_idx -= 1;
             }
 
             if ui.input(|i| i.modifiers.ctrl) {

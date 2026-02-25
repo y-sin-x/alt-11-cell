@@ -4,3 +4,4 @@ pub mod setup11c;
 pub mod state;
 pub mod twist;
 pub mod view;
+pub mod viewsettings;

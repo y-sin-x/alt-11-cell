@@ -66,8 +66,20 @@ pub fn face_rot(ccw: bool) -> Permutation {
     })
 }
 
+pub fn vertex_rot(ccw: bool) -> Permutation {
+    Permutation::new(if ccw {
+        vec![0, 2, 3, 4, 5, 1, 7, 8, 9, 10, 6]
+    } else {
+        vec![0, 5, 1, 2, 3, 4, 10, 6, 7, 8, 9]
+    })
+}
+
+pub fn edge_rot() -> Permutation {
+    Permutation::new(vec![0, 2, 1, 6, 9, 7, 3, 5, 8, 4, 10])
+}
+
 pub fn cell_positions() -> Vec<Vec2> {
-    let d = 2.3;
+    let d = 2.1;
     vec![
         Vec2::new(0.0, 0.0),
         Vec2::new(0.0, d),
@@ -93,9 +105,20 @@ pub fn cell_scales() -> Vec<f32> {
     vec![1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 }
 
+pub fn cell_outline() -> Vec<Vec2> {
+    let d = 0.95;
+    vec![
+        Vec2::new(0.0, d),
+        Vec2::new(-d * f32::sin(0.4 * PI), d * f32::cos(0.4 * PI)),
+        Vec2::new(-d * f32::sin(0.8 * PI), d * f32::cos(0.8 * PI)),
+        Vec2::new(d * f32::sin(0.8 * PI), d * f32::cos(0.8 * PI)),
+        Vec2::new(d * f32::sin(0.4 * PI), d * f32::cos(0.4 * PI)),
+    ]
+}
+
 pub fn faces() -> Vec<Face> {
-    let d1 = 0.7;
-    let d2 = 1.0;
+    let d1 = 0.5;
+    let d2 = 0.9;
     let v = vec![
         Vec2::new(0.0, 0.0),
         Vec2::new(0.0, -d1),
@@ -111,16 +134,21 @@ pub fn faces() -> Vec<Face> {
     ];
 
     vec![
-        Face::new(vec![v[0], v[3], v[4]]),
-        Face::new(vec![v[0], v[4], v[5]]),
-        Face::new(vec![v[0], v[5], v[1]]),
-        Face::new(vec![v[0], v[1], v[2]]),
-        Face::new(vec![v[0], v[2], v[3]]),
-        Face::new(vec![v[6], v[4], v[3]]),
-        Face::new(vec![v[7], v[5], v[4]]),
-        Face::new(vec![v[8], v[1], v[5]]),
-        Face::new(vec![v[9], v[2], v[1]]),
-        Face::new(vec![v[10], v[3], v[2]]),
+        Face::new(vec![v[0], v[3], v[4]], 1, false),
+        Face::new(vec![v[0], v[4], v[5]], 2, false),
+        Face::new(vec![v[0], v[5], v[1]], 3, false),
+        Face::new(vec![v[0], v[1], v[2]], 4, false),
+        Face::new(vec![v[0], v[2], v[3]], 5, false),
+        Face::new(vec![v[6], v[4], v[3]], 6, false),
+        Face::new(vec![v[7], v[5], v[4]], 7, false),
+        Face::new(vec![v[8], v[1], v[5]], 8, false),
+        Face::new(vec![v[9], v[2], v[1]], 9, false),
+        Face::new(vec![v[10], v[3], v[2]], 10, false),
+        Face::new(vec![v[1], v[9], v[8]], 6, true),
+        Face::new(vec![v[2], v[10], v[9]], 7, true),
+        Face::new(vec![v[3], v[6], v[10]], 8, true),
+        Face::new(vec![v[4], v[7], v[6]], 9, true),
+        Face::new(vec![v[5], v[8], v[7]], 10, true),
     ]
 }
 
@@ -141,7 +169,7 @@ pub fn colors(grip: usize) -> Color32 {
     }
 }
 
-pub fn substicker(face_piece: Piece, v: Vec<Vec2>) -> Substicker {
+pub fn substicker<'a>(face_piece: Piece, v: &'a Vec<Vec2>) -> Substicker<'a> {
     match face_piece.sig[..] {
         [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0] => Substicker::Ridge(v),
         [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0] => Substicker::Edge(v[1], v[2], v[0], v[1]),
@@ -152,4 +180,19 @@ pub fn substicker(face_piece: Piece, v: Vec<Vec2>) -> Substicker {
         [1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0] => Substicker::Vertex(v[1], v[2], v[0]),
         _ => Substicker::None,
     }
+}
+
+pub fn filters() -> Vec<Vec<u8>> {
+    vec![
+        vec![1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        vec![0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+        vec![0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0],
+        vec![0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0],
+        vec![0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0],
+        vec![0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0],
+        vec![0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0],
+        vec![0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        vec![0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        vec![1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ]
 }
