@@ -11,7 +11,7 @@ pub struct Polygon {
 
 impl Polygon {
     // only works if polygon is convex
-    pub fn contains_pos(&self, pos: Vec2) -> bool {
+    pub fn contains_pos(&self, pos: Pos2) -> bool {
         let n = self.vertices.len();
         let mut v1 = self.vertices[0] - self.vertices[n - 1];
         let mut v2 = pos - self.vertices[n - 1];
@@ -125,7 +125,9 @@ impl PuzzleView {
         let s = &self.settings;
         for cell in 0..self.state.degree {
             if pos.distance(self.calc_pos(cell, Vec2::ZERO)) < s.scale * s.cell_scale[cell].abs() {
-                let rel_pos = ((pos - s.offset) / s.scale - s.cell_pos[cell]) / s.cell_scale[cell];
+                let rel_pos = (((pos - s.offset) / s.scale - s.cell_pos[cell])
+                    / s.cell_scale[cell])
+                    .to_pos2();
                 let recenter = setup11c::cell_recenter(cell);
 
                 for face in &self.faces {

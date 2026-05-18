@@ -46,4 +46,13 @@ impl Permutation {
     pub fn permute(&self, num: usize) -> usize {
         self.perm[num]
     }
+
+    pub fn is_identity(&self) -> bool {
+        for i in 0..self.deg {
+            if self.perm[i] != i {
+                return false;
+            }
+        }
+        true
+    }
 }

@@ -155,16 +155,16 @@ pub fn faces() -> Vec<Face> {
 pub fn colors(grip: usize) -> Color32 {
     match grip {
         0 => Color32::from_rgb(127, 127, 127),
-        1 => Color32::WHITE,
+        1 => Color32::from_rgb(0, 191, 255),
         2 => Color32::GREEN,
         3 => Color32::YELLOW,
         4 => Color32::BLUE,
         5 => Color32::RED,
-        6 => Color32::from_rgb(0, 191, 255),
-        7 => Color32::from_rgb(255, 127, 255),
+        6 => Color32::from_rgb(255, 127, 0),
+        7 => Color32::PURPLE,
         8 => Color32::DARK_GREEN,
-        9 => Color32::PURPLE,
-        10 => Color32::from_rgb(255, 127, 0),
+        9 => Color32::from_rgb(127, 63, 0),
+        10 => Color32::from_rgb(255, 127, 255),
         _ => Color32::BLACK,
     }
 }
